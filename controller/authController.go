@@ -7,6 +7,7 @@ import (
 	"mocklogin/database"
 	"mocklogin/model"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -26,9 +27,12 @@ func Register(context *fiber.Ctx) error {
 	// hash the password before inserting into the database
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
 
+	nameArr := strings.Fields(data["name"])
+
 	// initialize User object with implicit type declaration
 	user := model.User{
-		Name: data["name"],
+		FirstName: nameArr[0],
+		LastName: nameArr[len(nameArr)-1],
 		Email: data["email"],
 		Password: password,
 	}
