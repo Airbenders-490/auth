@@ -5,13 +5,16 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"mocklogin/model"
+	"os"
 )
 
 // global var initialized as a pointer of type gorm.DB, to be able to pass connection to another package
 var DatabaseConnection *gorm.DB
 
 func Connect() {
-	dsn := "user=postgres password=password dbname=postgres port=62626 sslmode=disable"
+
+	dsn := fmt.Sprintf("user=%s password=%s dbname=%s port=%s sslmode=disable",
+		os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"), os.Getenv("DB_PORT"))
 
 	connection, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 

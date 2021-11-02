@@ -3,11 +3,20 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
+	"log"
 	"mocklogin/database"
 	"mocklogin/route"
 )
 
 func main() {
+
+	// load .env file from given path
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
 
 	database.Connect()
 

@@ -7,11 +7,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"mocklogin/database"
 	"mocklogin/model"
+	"os"
 	"strings"
 	"time"
 )
 
-const SecretKey = "secret"
+var SecretKey = os.Getenv("SECRET_KEY")
 
 func Register(context *fiber.Ctx) error {
 	// context has our request data
