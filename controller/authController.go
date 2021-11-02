@@ -3,10 +3,10 @@ package controller
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"mocklogin/database"
 	"mocklogin/model"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -31,6 +31,7 @@ func Register(context *fiber.Ctx) error {
 
 	// initialize User object with implicit type declaration
 	user := model.User{
+		ID: uuid.NewString(),
 		FirstName: nameArr[0],
 		LastName: nameArr[len(nameArr)-1],
 		Email: data["email"],
@@ -61,10 +62,10 @@ func Login(context *fiber.Ctx) error {
 		First(&user)
 
 	// if user doesn't exist
-	// user looks like : &{0   []}
+	// user looks like : &{""   []}
 	// success user looks like :
 	// &{3 carlin lee myemail2@gmail.com [36 50 97 36 49 52 ]}
-	if user.Id == 0 {
+	if user.ID == "" {
 		context.Status(fiber.StatusNotFound)
 		return context.JSON(fiber.Map{
 			"message": "User not found",
@@ -83,10 +84,24 @@ func Login(context *fiber.Ctx) error {
 	// The claim is digitally signed by the issuer of the token, and the party receiving this token
 	// can later use this digital signature to prove the ownership on the claim.
 	// https://www.softwaresecured.com/security-issues-jwt-authentication/
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer: strconv.Itoa(int(user.Id)), // reserved claim
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // expires in 24hours, reserved claim
-	})
+
+	type MyCustomClaims struct {
+		FirstName 	string `json:"first_name"`
+		LastName 	string `json:"last_name"`
+		jwt.StandardClaims
+	}
+
+	// Create the Custom Claims
+	claims := MyCustomClaims{
+user.FirstName,
+user.LastName,
+		jwt.StandardClaims{
+			Issuer:    user.ID, // reserved claim
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // expires in 24hours, reserved claim
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// The signature is used to verify the message wasn't changed along the way, and,
 	// in the case of tokens signed with a private key, it can also verify that the
