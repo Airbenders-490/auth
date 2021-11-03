@@ -22,7 +22,7 @@ to test login:
   "password": "mypassword12"
 }
 - send
-- should see success message and cookie
+- should see token returned
 
 
 to test Retrieve user:
@@ -30,10 +30,3 @@ to test Retrieve user:
 - on postman, choose GET, url: http://localhost:3000/api/user
 - send
 - should see user id, name, email
-
-
-
-to test logout:
-- on postman, choose POST, url: http://localhost:3000/api/logout
-- send
-- will see the cookie is gone

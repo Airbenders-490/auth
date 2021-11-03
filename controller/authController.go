@@ -116,19 +116,9 @@ user.LastName,
 		})
 	}
 
-	// create cookie
-	cookie := fiber.Cookie{
-		Name: "jwt",
-		Value: signedToken,
-		Expires: time.Now().Add(time.Hour * 24),
-		HTTPOnly: true, // means frontend cannot access, they just need to store and send it
-	}
-
-	context.Cookie(&cookie)
-
-	// frontend just gets success mssg, cannot access or use cookie
+	// frontend gets token then stores it their way
 	return context.JSON(fiber.Map{
-		"message": "success",
+		"token": signedToken,
 	})
 }
 
@@ -158,23 +148,4 @@ func RetrieveUser(context *fiber.Ctx) error {
 		First(&user)
 
 	return context.JSON(user)
-}
-
-func Logout(context *fiber.Ctx) error {
-	// there is no way to delete a cookie in the browser
-	// we have to re-assign the "jwt" value of the cookie by
-	// creating a new cookie with expired "jwt" value
-
-	expiredCookie := fiber.Cookie{
-		Name: "jwt",
-		Value: "",
-		Expires: time.Now().Add(-time.Hour),
-		HTTPOnly: true,
-	}
-
-	context.Cookie(&expiredCookie)
-
-	return context.JSON(fiber.Map{
-		"message": "success",
-	})
 }
