@@ -31,6 +31,8 @@ func main() {
 
 	route.Setup(app)
 
-	app.Listen(":3000")
+	if err := app.Listen(":3000") ; err != nil {
+		panic("Could not listen to port 3000")
+	}
 }
 

@@ -12,8 +12,10 @@ import (
 	"time"
 )
 
+// SecretKey for jwt encoding
 var SecretKey = os.Getenv("SECRET_KEY")
 
+// Register user for account
 func Register(context *fiber.Ctx) error {
 	// context has our request data
 
@@ -47,6 +49,7 @@ func Register(context *fiber.Ctx) error {
 	return context.JSON(user)
 }
 
+// Login user to account and return token
 func Login(context *fiber.Ctx) error {
 	var incomingCredentials map[string]string
 
@@ -94,8 +97,8 @@ func Login(context *fiber.Ctx) error {
 
 	// Create the Custom Claims
 	claims := MyCustomClaims{
-user.FirstName,
-user.LastName,
+		user.FirstName,
+		user.LastName,
 		jwt.StandardClaims{
 			Issuer:    user.ID, // reserved claim
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // expires in 24hours, reserved claim
@@ -122,6 +125,7 @@ user.LastName,
 	})
 }
 
+// RetrieveUser info
 func RetrieveUser(context *fiber.Ctx) error {
 	// fetch user's jwt cookie string value by key
 	jwtTokenString := context.Cookies("jwt")
