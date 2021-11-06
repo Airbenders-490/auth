@@ -1,12 +1,12 @@
 package controller
 
 import (
+	"github.com/airbenders/auth/database"
+	"github.com/airbenders/auth/model"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"mocklogin/database"
-	"mocklogin/model"
 	"os"
 	"strings"
 	"time"
@@ -34,16 +34,15 @@ func Register(context *fiber.Ctx) error {
 
 	// initialize User object with implicit type declaration
 	user := model.User{
-		ID: uuid.NewString(),
+		ID:        uuid.NewString(),
 		FirstName: nameArr[0],
-		LastName: nameArr[len(nameArr)-1],
-		Email: data["email"],
-		Password: password,
+		LastName:  nameArr[len(nameArr)-1],
+		Email:     data["email"],
+		Password:  password,
 	}
 
 	// insert reference to User object into database
 	database.DatabaseConnection.Create(&user)
-
 
 	// return http body content
 	return context.JSON(user)
@@ -90,8 +89,8 @@ func Login(context *fiber.Ctx) error {
 	// https://www.softwaresecured.com/security-issues-jwt-authentication/
 
 	type MyCustomClaims struct {
-		FirstName 	string `json:"first_name"`
-		LastName 	string `json:"last_name"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
 		jwt.StandardClaims
 	}
 
@@ -100,7 +99,7 @@ func Login(context *fiber.Ctx) error {
 		user.FirstName,
 		user.LastName,
 		jwt.StandardClaims{
-			Issuer:    user.ID, // reserved claim
+			Issuer:    user.ID,                               // reserved claim
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // expires in 24hours, reserved claim
 		},
 	}
@@ -125,13 +124,20 @@ func Login(context *fiber.Ctx) error {
 	})
 }
 
-// RetrieveUser info
-func RetrieveUser(context *fiber.Ctx) error {
+// ValidateLogin info
+func ValidateLogin(context *fiber.Ctx) error {
 	// fetch user's jwt cookie string value by key
-	jwtTokenString := context.Cookies("jwt")
+	jwtTokenString := string(context.Request().Header.Peek("Authorization"))
+	if jwtTokenString == "" || jwtTokenString[:7] != "Bearer " {
+		context.Status(fiber.StatusUnauthorized)
+		return context.JSON(fiber.Map{
+			"message": "Unauthenticated User or invalid header",
+		})
+	}
+	jwtTokenString = strings.Replace(jwtTokenString, "Bearer ", "", 1)
 
 	// want to be able to regenerate our SecretKey else error
-	token, err := jwt.ParseWithClaims(jwtTokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(jwtTokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SecretKey), nil
 	})
 
@@ -143,13 +149,15 @@ func RetrieveUser(context *fiber.Ctx) error {
 		})
 	}
 
-	standardClaims := token.Claims.(*jwt.StandardClaims) // Type assertion; interface to struct
+	//standardClaims := token.Claims.(*jwt.StandardClaims) // Type assertion; interface to struct
+	//
+	//var user model.User
+	//
+	//database.DatabaseConnection.
+	//	Where("id = ?", standardClaims.Issuer).
+	//	First(&user)
 
-	var user model.User
-
-	database.DatabaseConnection.
-		Where("id = ?", standardClaims.Issuer).
-		First(&user)
-
-	return context.JSON(user)
+	return context.JSON(fiber.Map{
+		"message": "valid",
+	})
 }

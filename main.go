@@ -1,21 +1,23 @@
 package main
 
 import (
+	"github.com/airbenders/auth/database"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 	"log"
-	"mocklogin/database"
-	"mocklogin/route"
+
+	//"github.com/airbenders/auth/controller"
+	"github.com/airbenders/auth/route"
 )
 
 func main() {
 
-	// load .env file from given path
+	//load .env file from given path
 	err := godotenv.Load(".env")
 
 	if err != nil {
-		log.Fatalf("Error loading .env file")
+		log.Println("Error loading .env file")
 	}
 
 	database.Connect()
@@ -31,8 +33,7 @@ func main() {
 
 	route.Setup(app)
 
-	if err := app.Listen(":3000") ; err != nil {
+	if err := app.Listen(":3000"); err != nil {
 		panic("Could not listen to port 3000")
 	}
 }
-

@@ -1,13 +1,13 @@
 package route
 
 import (
+	"github.com/airbenders/auth/controller"
 	"github.com/gofiber/fiber/v2"
-	"mocklogin/controller"
 )
 
 // Setup auth routes
 func Setup(app *fiber.App) {
 	app.Post("/api/register", controller.Register)
 	app.Post("/api/login", controller.Login)
-	app.Get("/api/user", controller.RetrieveUser)
+	app.Get("/api/validate", controller.ValidateLogin)
 }
