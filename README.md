@@ -1,3 +1,5 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/60f6d7c81fb4415cad928fd9daa17a9c)](https://www.codacy.com/gh/Airbenders-490/auth/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Airbenders-490/auth&amp;utm_campaign=Badge_Grade)
+
 Uses Fiber for web framework.
 
 To run server, run `go run ./main.go`
