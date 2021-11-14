@@ -1,11 +1,6 @@
 name: Go Test
 
-on: 
-  pull_request:
-  push:
-    branches:
-      - master
-      - testCoverageReportCodecov
+on: [push, pull_request]
 
 jobs:
   test:
@@ -22,7 +17,12 @@ jobs:
     - name: Collect coverage files
       shell: bash
       run: echo "COVERAGES=$(find . -type f -name 'coverage.txt' | tr -s '\n' ',' | sed 's/,$//')" >> $GITHUB_ENV
-    - name: Upload coverage to Codecov
+    - name: Upload coverage file to Codecov
       uses: codecov/codecov-action@v2
       with:
         files: '${{ env.COVERAGES }}'
+    - name: Upload coverage file to Codacy
+      uses: codacy/codacy-coverage-reporter-action@v1
+      with:
+        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        coverage-reports: '${{ env.COVERAGES }}'
