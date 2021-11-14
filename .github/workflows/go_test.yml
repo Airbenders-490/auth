@@ -22,7 +22,5 @@ jobs:
       with:
         files: '${{ env.COVERAGES }}'
     - name: Upload coverage file to Codacy
-      uses: codacy/codacy-coverage-reporter-action@v1
-      with:
-        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        coverage-reports: "coverage.txt"
+      shell: bash
+      run: '<(curl -Ls https://coverage.codacy.com/get.sh) report --force-coverage-parser go -r coverage.txt -t ${{ secrets.CODACY_PROJECT_TOKEN }} --commit-uuid ${{GITHUB_SHA}}'
